@@ -1,29 +1,34 @@
 mod factors;
 mod vec_mulsum;
-use crate::factors::{Factors, factors};
-use vec_mulsum::vec_mulsum;
 
-pub struct SolutionsIter {
-    factors_iter: Factors,
-    stamps: Vec<u32>,
-    price: u32,
+use std::ops::AddAssign;
+use std::iter::Sum;
+use num::{Integer, ToPrimitive};
+use crate::factors::{Factors, factors};
+use crate::vec_mulsum::vec_mulsum;
+
+pub struct SolutionsIter<T: Integer + Clone> {
+    factors_iter: Factors<T>,
+    stamps: Vec<T>,
+    price: T,
 }
 
-pub fn solutions_for_price<'a>(price: u32, stamps: &'a Vec<u32>)
-    -> SolutionsIter
+pub fn solutions_for_price<'a, T>(price: T, stamps: &'a Vec<T>)
+    -> SolutionsIter<T>
+where
+    T: Integer + ToPrimitive + Sum + Copy
 {
-    let max_factors = stamps.into_iter().map(|s| price / s).collect::<Vec<_>>();
-    let factors_iter = factors(&max_factors);
+    let max_factors = stamps.into_iter().map(|s| price / *s).collect::<Vec<_>>();
 
     SolutionsIter {
-        factors_iter: factors_iter,
+        factors_iter: factors(&max_factors),
         stamps: stamps.clone(),
         price: price,
     }
 }
 
-impl Iterator for SolutionsIter {
-    type Item = Vec<u32>;
+impl<T: Integer + AddAssign + Sum + Copy> Iterator for SolutionsIter<T> {
+    type Item = Vec<T>;
 
     fn next(&mut self) -> Option<Self::Item> {
         loop {

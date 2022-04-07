@@ -1,6 +1,8 @@
-pub fn vec_mulsum(a: &Vec<u32>, b: &Vec<u32>) -> u32 {
-    let zipped = a.into_iter().zip(b.into_iter());
-    zipped.map(|(x, y)| x * y).sum()
+use std::iter::zip;
+use num::Integer;
+
+pub fn vec_mulsum<T: Integer + Copy + std::iter::Sum>(a: &Vec<T>, b: &Vec<T>) -> T {
+    zip(a, b).map(|(x, y)| *x * *y).sum()
 }
 
 #[cfg(test)]
